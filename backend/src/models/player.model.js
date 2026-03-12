@@ -1,71 +1,97 @@
 const mongoose = require('mongoose');
 
-const VALID_POSITIONS = ['GK', 'DF', 'MF', 'FW'];
+const VALID_POSITIONS = [
+    'GK', 'CB', 'LB', 'RB', 'LWB', 'RWB',
+    'CDM', 'CM', 'CAM', 'LM', 'RM',
+    'ST', 'CF', 'LW', 'RW'
+];
 
-const playerSchema = new mongoose.Schema( {
+const playerSchema = new mongoose.Schema(
+    {
+        _id: {
+            type: String,
+            required: true
+        },
+
         name: {
             type: String,
-            required: [true, 'El nom es obligatori'],
-            minlength: [2, 'El nom ha de tenir minim 2 caracteres'],
-            maxlength: [50, 'El nom no pot superar els 50 caracteres'],
+            required: [true, 'El nom és obligatori'],
             trim: true,
+            minlength: [2, 'El nom ha de tenir mínim 2 caràcters'],
+            maxlength: [50, 'El nom no pot superar els 50 caràcters'],
         },
-        age: {
+
+        position: {
+            type: String,
+            required: [true, 'La posició és obligatòria'],
+            enum: {
+                values: VALID_POSITIONS,
+                message: `La posició ha de ser una de: ${VALID_POSITIONS.join(', ')}`
+            }
+        },
+
+        number: {
             type: Number,
-            required: [true, 'La edat es obligatoria'],
-            min: [15, 'La edat minima es 15'],
-            max: [50, 'La edat maxima es 50'],
+            required: [true, 'El dorsal és obligatori'],
+            min: [1, 'El dorsal mínim és 1'],
+            max: [99, 'El dorsal màxim és 99']
         },
+
         isInjured: {
             type: Boolean,
             required: true,
-            default: false,
+            default: false
         },
+
+        birthDate: {
+            type: Date,
+            required: [true, 'La data de naixement és obligatòria']
+        },
+
         contractEnd: {
             type: Date,
-            required: [true, 'La data de fi de contracte es obligatoria'],
+            required: [true, 'La data de fi de contracte és obligatòria'],
             validate: {
                 validator: function (value) {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
                     return value >= today;
                 },
-                message: 'La data de fi de contracte no pot ser anterior a avui',
-            },
+                message: 'La data de fi de contracte no pot ser anterior a avui'
+            }
         },
-        positions: {
+
+        teams: {
             type: [String],
-            required: [true, 'Ha de tenir almenys una posició'],
-            validate: [
-                {
-                    validator: function (arr) {
-                        return arr.length > 0;
-                    },
-                    message: 'Ha de tenir almenys una posició',
+            required: [true, 'Ha de tenir almenys un equip'],
+            validate: {
+                validator: function (arr) {
+                    return arr.length > 0;
                 },
-                {
-                    validator: function (arr) {
-                        return arr.every((pos) => VALID_POSITIONS.includes(pos));
-                    },
-                    message: `Les posicions han de ser una de: ${VALID_POSITIONS.join(', ')}`,
-                },
-            ],
+                message: 'Ha de tenir almenys un equip'
+            }
         },
-        marketValue: {
-            type: Number,
-            required: [true, 'El valor de mercat es obligatori'],
-            min: [0, 'El valor de mercat no pot ser negatiu'],
-        },
-        club: {
+
+        image: {
             type: String,
-            required: [true, 'El club es obligatori'],
-            minlength: [2, 'El club ha de tenir almenys 2 caracteres'],
-            maxlength: [50, 'El club no pot superar 50 caracteres'],
-            trim: true,
+            required: [true, 'La imatge és obligatòria'],
+            validate: {
+                validator: function (url) {
+                    return /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)$/i.test(url);
+                },
+                message: 'La imatge ha de ser una URL vàlida'
+            }
         },
+
+        description: {
+            type: String,
+            required: [true, 'La descripció és obligatòria'],
+            minlength: [10, 'La descripció ha de tenir mínim 10 caràcters'],
+            maxlength: [2000, 'La descripció no pot superar els 2000 caràcters']
+        }
     },
     {
-        timestamps: true,
+        timestamps: true
     }
 );
 

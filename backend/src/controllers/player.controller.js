@@ -1,54 +1,61 @@
 const Player = require('../models/player.model');
 
 // GET api/players
-const getPlayers = async (req,res,next) => {
-    try{
+const getPlayers = async (req, res, next) => {
+    try {
         const players = await Player.find();
         res.json(players);
-    } catch (err){
+    } catch (err) {
         next(err);
     }
 };
 
 // GET /api/players/:id
-const getPlayerById = async (req,res,next) => {
-    try{
+const getPlayerById = async (req, res, next) => {
+    try {
         const player = await Player.findById(req.params.id);
-        if(!player){
-                  return res.status(404).json({ message: 'Jugador no trobat' });
+        if (!player) {
+            return res.status(404).json({ message: 'Jugador no trobat' });
         }
         res.json(player);
-    } catch (err){
+    } catch (err) {
         next(err);
     }
 };
 
 // POST /api/players
 
-const createPlayer = async (req,res,next) => {
-    
-    try{
-        const player = new Player(req.body);
+const createPlayer = async (req, res, next) => {
+    try {
+        const data = { ...req.body };
+
+        if (data.id) {
+            data._id = data.id;
+            delete data.id;
+        }
+
+        const player = new Player(data);
         const saved = await player.save();
         res.status(201).json(saved);
-    } catch(err){
-       next(err); 
+    } catch (err) {
+        next(err);
     }
 };
 
+
 // PUT /api/players/:id
 
-const updatePlayer = async (req,res,next) => {
-    try{
+const updatePlayer = async (req, res, next) => {
+    try {
         const updated = await Player.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true,
         });
-        if(!updated){
+        if (!updated) {
             return res.status(404).json({ message: 'Jugador no trobat' });
         }
         res.json(updated);
-    } catch(err){
+    } catch (err) {
         next(err);
     }
 };
@@ -56,23 +63,23 @@ const updatePlayer = async (req,res,next) => {
 // DELETE /api/players/:id
 
 const deletePlayer = async (req, res, next) => {
-    try{
+    try {
         const deleted = await Player.findByIdAndDelete(req.params.id);
-        if(!deleted){
+        if (!deleted) {
             return res.status(404).json({ message: 'Jugador no trobat' });
         }
-        res.status(204).send(); 
-    } catch(err){
+        res.status(204).send();
+    } catch (err) {
         next(err);
     }
 };
 
 module.exports = {
-  getPlayers,
-  getPlayerById,
-  createPlayer,
-  updatePlayer,
-  deletePlayer,
+    getPlayers,
+    getPlayerById,
+    createPlayer,
+    updatePlayer,
+    deletePlayer,
 };
 
 

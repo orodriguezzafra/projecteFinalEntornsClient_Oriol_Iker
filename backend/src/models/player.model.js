@@ -8,10 +8,6 @@ const VALID_POSITIONS = [
 
 const playerSchema = new mongoose.Schema(
     {
-        _id: {
-            type: String,
-            required: true
-        },
 
         name: {
             type: String,

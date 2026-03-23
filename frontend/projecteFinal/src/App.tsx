@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import Card from './components/Card';
-import { getJugadores } from './services/api';
+import { useState, useEffect } from "react";
+import Card from "./components/Card";
+import { getJugadores } from "./services/api";
 
-type Jugador = {
+export type Jugador = {
   _id: string;
   name: string;
   number: number;
@@ -17,22 +17,18 @@ type Jugador = {
 
 function App() {
   const [jugadors, setJugadors] = useState<Jugador[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getJugadores()
-      .then((data: Jugador[]) => setJugadors(data))
-      .catch((err: unknown) => console.error("Error cargando jugadores", err))
+      .then(setJugadors)
+      .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p>Cargando jugadores...</p>;
+  if (loading) return <p className="text-center mt-5">Cargando jugadores...</p>;
 
-  return (
-    <div>
-      <Card jugadors={jugadors} setJugadors={setJugadors} />
-    </div>
-  );
+  return <Card jugadors={jugadors} setJugadors={setJugadors} />;
 }
 
 export default App;
